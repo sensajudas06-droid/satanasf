@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-posta Testi - Satanas Fidelis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0a0a0a;
+            color: #ffffff;
+            padding: 40px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #dc2626;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #9ca3af;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            background-color: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 6px;
+            color: #ffffff;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #b91c1c;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 6px;
+            display: none;
+        }
+        .success {
+            background-color: #065f46;
+            border: 1px solid #10b981;
+            color: #10b981;
+        }
+        .error {
+            background-color: #7f1d1d;
+            border: 1px solid #dc2626;
+            color: #fca5a5;
+        }
+        .info {
+            background-color: #1e3a8a;
+            border: 1px solid #3b82f6;
+            color: #93c5fd;
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <h1>E-posta Servisi Test</h1>
+
+    <div class="info">
+        <strong>Not:</strong> Bu test sayfası e-posta gönderme servisini test etmek içindir.
+        Gerçek bir e-posta adresi girin ve doğrulama kodunu e-postanızda kontrol edin.
+    </div>
+
+    <form id="emailForm">
+        <div class="form-group">
+            <label for="email">E-posta Adresi</label>
+            <input
+                type="email"
+                id="email"
+                placeholder="ornek@email.com"
+                required
+            />
+        </div>
+
+        <button type="submit" id="submitBtn">
+            Doğrulama Kodu Gönder
+        </button>
+    </form>
+
+    <div id="result" class="result"></div>
+
+    <script type="module">
+        const SUPABASE_URL = 'https://jhuyfbcexstvekpyqkwc.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpodXlmYmNleHN0dmVrcHlxa3djIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1OTMwNDMsImV4cCI6MjA4NzE2OTA0M30.EgAl91d57TvQ8G7uwsHvro2Ynz3iaekKxwwE6v6AYPY';
+
+        const form = document.getElementById('emailForm');
+        const emailInput = document.getElementById('email');
+        const submitBtn = document.getElementById('submitBtn');
+        const resultDiv = document.getElementById('result');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = emailInput.value.trim();
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Gönderiliyor...';
+            resultDiv.style.display = 'none';
+
+            try {
+                const apiUrl = `${SUPABASE_URL}/functions/v1/send-verification-email`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <strong>Başarılı!</strong><br>
+                        ${data.message}<br>
+                        ${data.code ? `<br><strong>Geliştirme Kodu:</strong> ${data.code}` : ''}
+                    `;
+                } else {
+                    throw new Error(data.error || data.details || 'Bilinmeyen hata');
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `
+                    <strong>Hata!</strong><br>
+                    ${error.message}
+                `;
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Doğrulama Kodu Gönder';
+                resultDiv.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

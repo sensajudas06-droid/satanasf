@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-black text-white;
+    font-family: 'Crimson Text', 'Georgia', serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cinzel', 'Times New Roman', serif;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+}
+
+@layer utilities {
+  .occult-glow {
+    text-shadow: 0 0 20px rgba(220, 38, 38, 0.5), 0 0 40px rgba(220, 38, 38, 0.3);
+  }
+
+  .gothic-title {
+    font-family: 'Cinzel', serif;
+    font-weight: 900;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .gothic-subtitle {
+    font-family: 'UnifrakturMaguntia', cursive;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+  }
+
+  .gothic-body {
+    font-family: 'Crimson Text', serif;
+    font-weight: 400;
+    line-height: 1.8;
+  }
+
+  .occult-border {
+    border-image: linear-gradient(45deg, #7f1d1d, #dc2626, #7f1d1d) 1;
+  }
+
+  .pentagram-bg {
+    background-image: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.95) 100%),
+                      repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(127, 29, 29, 0.03) 2px, rgba(127, 29, 29, 0.03) 4px);
+  }
+
+  .mystical-gradient {
+    background: linear-gradient(135deg, #000000 0%, #1a0000 50%, #000000 100%);
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes rotate-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse-red {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-rotate-slow {
+  animation: rotate-slow 20s linear infinite;
+}
+
+.animate-pulse-red {
+  animation: pulse-red 3s ease-in-out infinite;
+}

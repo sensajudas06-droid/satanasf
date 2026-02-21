@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitap İçeriklerini Yükle</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #111;
+            color: #fff;
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background: #222;
+            border-left: 4px solid #666;
+        }
+        .status.success {
+            border-left-color: #4caf50;
+        }
+        .status.error {
+            border-left-color: #f44336;
+        }
+        .status.info {
+            border-left-color: #2196F3;
+        }
+        button {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 20px 0;
+        }
+        button:hover {
+            background: #b91c1c;
+        }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <h1>Kitap İçeriklerini Veritabanına Yükle</h1>
+    <p>Bu sayfa, kitapların tam metinlerini veritabanına yükleyecek.</p>
+
+    <button id="uploadBtn" onclick="uploadBooks()">Yüklemeyi Başlat</button>
+
+    <div id="status"></div>
+
+    <script type="module">
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+        const supabaseUrl = 'https://jhuyfbcexstvekpyqkwc.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpodXlmYmNleHN0dmVrcHlxa3djIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1OTMwNDMsImV4cCI6MjA4NzE2OTA0M30.EgAl91d57TvQ8G7uwsHvro2Ynz3iaekKxwwE6v6AYPY';
+
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        function addStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.textContent = message;
+            statusDiv.appendChild(div);
+        }
+
+        window.uploadBooks = async function() {
+            const btn = document.getElementById('uploadBtn');
+            btn.disabled = true;
+            document.getElementById('status').innerHTML = '';
+
+            const books = [
+                { title: 'Ayetler Kitabı', file: 'Ayetler_Kitabi_extracted.txt' },
+                { title: 'Gerçekler Kitabı', file: 'Gercekler_Kitabi_extracted.txt' },
+                { title: 'İsa Kitabı', file: 'Isa_Kitabi_extracted.txt' }
+            ];
+
+            for (const bookInfo of books) {
+                addStatus(`${bookInfo.title} işleniyor...`, 'info');
+
+                const { data: book } = await supabase
+                    .from('books')
+                    .select('id')
+                    .eq('title', bookInfo.title)
+                    .maybeSingle();
+
+                if (!book) {
+                    addStatus(`Kitap bulunamadı: ${bookInfo.title}`, 'error');
+                    continue;
+                }
+
+                const { data: existingChapter } = await supabase
+                    .from('book_chapters')
+                    .select('id')
+                    .eq('book_id', book.id)
+                    .eq('chapter_number', 1)
+                    .maybeSingle();
+
+                if (existingChapter) {
+                    addStatus(`${bookInfo.title} zaten yüklenmiş`, 'info');
+                    continue;
+                }
+
+                try {
+                    const response = await fetch(`/${bookInfo.file}`);
+                    const text = await response.text();
+
+                    const { error } = await supabase
+                        .from('book_chapters')
+                        .insert({
+                            book_id: book.id,
+                            chapter_number: 1,
+                            title: bookInfo.title,
+                            content: text
+                        });
+
+                    if (error) {
+                        addStatus(`Hata: ${bookInfo.title} - ${error.message}`, 'error');
+                    } else {
+                        addStatus(`Başarılı: ${bookInfo.title}`, 'success');
+                    }
+                } catch (err) {
+                    addStatus(`Dosya okunamadı: ${bookInfo.file} - ${err.message}`, 'error');
+                }
+            }
+
+            addStatus('Yükleme tamamlandı!', 'success');
+            btn.disabled = false;
+        }
+    </script>
+</body>
+</html>
