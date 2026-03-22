@@ -16,8 +16,9 @@ import AuthorPage from './pages/AuthorPage';
 import BookReaderPage from './pages/BookReaderPage';
 import TestEmailPage from './pages/TestEmailPage';
 import EmailVerifyPage from './pages/EmailVerifyPage';
+import SecureCommsPage from './pages/SecureCommsPage';
 
-type Page = 'home' | 'post' | 'books' | 'library' | 'auth' | 'profile' | 'admin' | 'post-editor' | 'book-editor' | 'library-upload' | 'author' | 'book-reader' | 'test-email' | 'verify-email';
+type Page = 'home' | 'post' | 'books' | 'library' | 'secure-comms' | 'auth' | 'profile' | 'admin' | 'post-editor' | 'book-editor' | 'library-upload' | 'author' | 'book-reader' | 'test-email' | 'verify-email';
 
 function AppContent() {
   const { loading: authLoading } = useAuth();
@@ -71,6 +72,7 @@ function AppContent() {
         {currentPage === 'post' && <PostPage postId={pageParams} onNavigate={handleNavigate} />}
         {currentPage === 'books' && <BooksPage selectedBookId={pageParams} onNavigate={handleNavigate} />}
         {currentPage === 'library' && <LibraryPage onNavigate={handleNavigate} />}
+        {currentPage === 'secure-comms' && <SecureCommsPage />}
         {currentPage === 'auth' && <AuthPage onNavigate={handleNavigate} />}
         {currentPage === 'profile' && <ProfilePage onNavigate={handleNavigate} />}
         {currentPage === 'admin' && <AdminPage onNavigate={handleNavigate} />}

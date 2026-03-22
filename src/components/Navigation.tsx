@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Menu, X, BookOpen, Library, FileText, User, LogOut, Settings } from 'lucide-react';
+import { Menu, X, BookOpen, Library, FileText, User, LogOut, Settings, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import InvertedPentagram from './InvertedPentagram';
 import NotificationCenter from './NotificationCenter';
@@ -17,6 +17,7 @@ export default function Navigation({ currentPage, onNavigate }: NavigationProps)
     { id: 'home', label: 'Ana Sayfa', icon: FileText },
     { id: 'books', label: 'Üç Kitap', icon: BookOpen },
     { id: 'library', label: 'Kütüphane', icon: Library },
+    { id: 'secure-comms', label: 'Güvenli İletişim', icon: ShieldCheck },
   ];
 
   const handleNavigation = (page: string) => {
